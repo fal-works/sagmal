@@ -33,6 +33,13 @@ interface ParameterLayer {
 }
 
 /**
+ * Normalizes target language string, converting 'en' (case-insensitive) to 'en-US'.
+ */
+function normalizeTargetLanguage(lang: string): string {
+	return lang.toLowerCase() === "en" ? "en-US" : lang;
+}
+
+/**
  * Coalesces a property from two parameter layers, with higher priority taking precedence.
  */
 function coalesceProperty<T, K extends keyof T>(target: T, lower: T, higher: T, key: K): void {
@@ -87,7 +94,9 @@ function createConfigLayer(
 	if (config.deepL?.sourceLang)
 		result.sourceLanguage = config.deepL.sourceLang as deepl.SourceLanguageCode;
 	if (config.deepL?.targetLang)
-		result.targetLanguage = config.deepL.targetLang as deepl.TargetLanguageCode;
+		result.targetLanguage = normalizeTargetLanguage(
+			config.deepL.targetLang,
+		) as deepl.TargetLanguageCode;
 	if (config.copyToClipboard !== undefined) result.shouldCopyToClipboard = config.copyToClipboard;
 
 	return result;
@@ -107,7 +116,9 @@ function createCliLayer(
 	if (mergedCliLanguages.sourceLang)
 		result.sourceLanguage = mergedCliLanguages.sourceLang as deepl.SourceLanguageCode;
 	if (mergedCliLanguages.targetLang)
-		result.targetLanguage = mergedCliLanguages.targetLang as deepl.TargetLanguageCode;
+		result.targetLanguage = normalizeTargetLanguage(
+			mergedCliLanguages.targetLang,
+		) as deepl.TargetLanguageCode;
 	if (cliCopyFlag) result.shouldCopyToClipboard = true;
 
 	return result;
@@ -160,16 +171,12 @@ function applyPostProcessing(
 		);
 	}
 
-	// Normalize target language ('en' -> 'en-US')
-	// At this point targetLanguage is guaranteed to exist due to default layer
-	const targetLanguage = resolved.targetLanguage ?? "en-US";
-	const normalizedTarget = targetLanguage.toLowerCase() === "en" ? "en-US" : targetLanguage;
-
 	// Convert to final resolved parameters with guaranteed values
 	// These values are guaranteed to exist due to default layer providing fallbacks
+	// Target language normalization is now handled in layer creation functions
 	return {
 		sourceLanguage: resolved.sourceLanguage ?? null, // null is valid (auto-detect)
-		targetLanguage: normalizedTarget,
+		targetLanguage: resolved.targetLanguage ?? "en-US",
 		translationOptions: resolved.translationOptions ?? {},
 		shouldCopyToClipboard: resolved.shouldCopyToClipboard ?? false,
 	};
