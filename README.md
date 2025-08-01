@@ -71,6 +71,14 @@ ja: 私は大丈夫です :vi      # from Japanese to Vietnamese
 
 You can configure the tool by creating a `.sagmalrc.json` file in either your home directory or the current directory.
 
+For editor validation and autocompletion, add the JSON schema reference at the top of your config file:
+
+```json
+{
+  "$schema": "https://fal-works.github.io/sagmal/sagmalrc/v0.x.x/schema.json"
+}
+```
+
 The configuration file must be in JSON format and can include:
 
 - `copyToClipboard`: Automatically copy translated text to clipboard.
@@ -81,6 +89,7 @@ The configuration file must be in JSON format and can include:
 
 ```json
 {
+  "$schema": "https://fal-works.github.io/sagmal/sagmalrc/v0.x.x/schema.json",
   "copyToClipboard": true,
   "deepL": {
     "sourceLang": "ja",
