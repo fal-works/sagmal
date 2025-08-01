@@ -44,11 +44,11 @@ export interface SagmalRcInputs {
  * @returns File content as string
  * @throws SagmalError if file cannot be read
  */
-function readConfigFileContent(path: string): string {
+function readFileContent(path: string): string {
 	try {
 		return readFileSync(path, "utf-8");
 	} catch (error) {
-		throw new SagmalError(`Cannot read config file: ${path}\n  ${stringifyError(error)}`);
+		throw new SagmalError(`Cannot read file: ${path}\n  ${stringifyError(error)}`);
 	}
 }
 
@@ -60,23 +60,23 @@ function readConfigFileContent(path: string): string {
  * @returns Parsed JSON data
  * @throws SagmalError if JSON is invalid
  */
-function parseConfigJson(content: string, path: string): unknown {
+function parseJson(content: string, path: string): unknown {
 	try {
 		return JSON.parse(content);
 	} catch (error) {
-		throw new SagmalError(`Invalid JSON in config file: ${path}\n  ${stringifyError(error)}`);
+		throw new SagmalError(`Invalid JSON: ${path}\n  ${stringifyError(error)}`);
 	}
 }
 
 /**
- * Validates and types parsed config data.
+ * Validates and types parsed `.sagmalrc` data.
  *
  * @param parsed - Parsed JSON data
  * @param path - File path for error messages
  * @returns Typed config object
  * @throws SagmalError if data is not a valid config object
  */
-function validateConfigData(parsed: unknown, path: string): SagmalRc {
+function validateSagmalRc(parsed: unknown, path: string): SagmalRc {
 	if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
 		throw new SagmalError(
 			`Invalid config file: ${path}\n  must be an object, not ${Array.isArray(parsed) ? "array" : typeof parsed}`,
@@ -94,14 +94,14 @@ function validateConfigData(parsed: unknown, path: string): SagmalRc {
  * @returns Parsed object or undefined if file doesn't exist
  * @throws SagmalError if file cannot be read, JSON is malformed, or data is not an object
  */
-function loadConfigFile(path: string): SagmalRc | undefined {
+function loadSagmalRc(path: string): SagmalRc | undefined {
 	if (!existsSync(path)) {
 		return undefined;
 	}
 
-	const content = readConfigFileContent(path);
-	const parsed = parseConfigJson(content, path);
-	return validateConfigData(parsed, path);
+	const content = readFileContent(path);
+	const parsed = parseJson(content, path);
+	return validateSagmalRc(parsed, path);
 }
 
 /**
@@ -111,8 +111,8 @@ function loadConfigFile(path: string): SagmalRc | undefined {
  */
 export function loadSagmalRcInputs(): SagmalRcInputs {
 	const homeDir = homedir();
-	const homeConfig = loadConfigFile(join(homeDir, ".sagmalrc.json"));
-	const localConfig = loadConfigFile(join(process.cwd(), ".sagmalrc.json"));
+	const homeConfig = loadSagmalRc(join(homeDir, ".sagmalrc.json"));
+	const localConfig = loadSagmalRc(join(process.cwd(), ".sagmalrc.json"));
 
 	return {
 		home: homeConfig ?? {},
