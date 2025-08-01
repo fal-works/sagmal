@@ -48,9 +48,9 @@ graph LR
 - **Data Source**: Home directory and current directory `.sagmalrc.json` files
 
 #### `src/cli-parser.ts` - CLI Argument Parsing
-- **Responsibility**: Parse all CLI arguments and extract options
-- **Input**: All CLI arguments
-- **Output**: Parsed language options and remaining text parts
+- **Responsibility**: Parse all CLI arguments and return structured data
+- **Output**: Parsed command options, language options, and remaining text parts
+- **Key Pattern**: Uses Node.js built-in `parseArgs` and then also extract options from positionals
 
 #### `src/cli-language-parser.ts` - CLI Language Option Parsing
 - **Responsibility**: Parse individual colon-separated language options
