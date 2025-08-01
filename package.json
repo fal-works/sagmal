@@ -1,7 +1,7 @@
 {
 	"name": "@fal-works/sagmal",
 	"version": "0.1.0",
-	"description": "CLI for transformation using DeepL API",
+	"description": "CLI for text translation using DeepL API",
 	"type": "module",
 	"bin": {
 		"sagmal": "./dist/bin.js"

@@ -17,15 +17,17 @@ SAGMAL_DEEPL_API_KEY=your-api-key-here
 
 Then run the CLI tool with:
 
-```sh
+```text
 npx sagmal <text-to-translate>
 ```
 
 Or, if you have installed it globally:
 
-```sh
+```text
 sagmal <text-to-translate>
 ```
+
+Then you will see the translated text in your terminal.
 
 
 ## Specifying Languages
