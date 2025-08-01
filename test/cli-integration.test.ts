@@ -8,17 +8,19 @@ describe("CLI Integration", () => {
 
 	/**
 	 * Helper function to run the CLI application and capture its output.
-	 * 
+	 *
 	 * Spawns a Node.js child process to execute the compiled CLI binary with the provided arguments.
 	 * This simulates running the CLI tool from the command line and captures all output streams.
-	 * 
+	 *
 	 * @param args - Command line arguments to pass to the CLI application
 	 * @returns Promise resolving to an object containing:
 	 *   - stdout: Standard output as a string
-	 *   - stderr: Standard error output as a string  
+	 *   - stderr: Standard error output as a string
 	 *   - code: Process exit code (0 for success, non-zero for failure)
 	 */
-	async function runCli(args: string[]): Promise<{ stdout: string; stderr: string; exitCode: number }> {
+	async function runCli(
+		args: string[],
+	): Promise<{ stdout: string; stderr: string; exitCode: number }> {
 		return new Promise((resolve) => {
 			const child = spawn("node", [binPath, ...args], {
 				stdio: ["pipe", "pipe", "pipe"], // Pipe stdin, stdout, stderr for output capture
