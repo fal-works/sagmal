@@ -162,12 +162,12 @@ function applyPostProcessing(
 
 	if (homeOptions && "__path" in homeOptions) {
 		throw new SagmalError(
-			"Invalid config: '__path' is an internal-only field and cannot be used in configuration",
+			"Invalid .sagmalrc in the home directory: '__path' is an internal-only field and cannot be used in configuration",
 		);
 	}
 	if (localOptions && "__path" in localOptions) {
 		throw new SagmalError(
-			"Invalid config: '__path' is an internal-only field and cannot be used in configuration",
+			"Invalid .sagmalrc in the current directory: '__path' is an internal-only field and cannot be used in configuration",
 		);
 	}
 

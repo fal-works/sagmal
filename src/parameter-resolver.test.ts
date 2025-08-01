@@ -230,7 +230,7 @@ describe("parameter-resolver", () => {
 
 			assert.throws(() => {
 				resolveParameters({ first: null, last: null }, config, false);
-			}, /Invalid config: '__path' is an internal-only field/);
+			}, /Invalid \.sagmalrc in the .* directory: '__path' is an internal-only field/);
 		});
 
 		it("should throw error for __path in local config options", () => {
@@ -248,7 +248,7 @@ describe("parameter-resolver", () => {
 
 			assert.throws(() => {
 				resolveParameters({ first: null, last: null }, config, false);
-			}, /Invalid config: '__path' is an internal-only field/);
+			}, /Invalid \.sagmalrc .* directory: '__path' is an internal-only field/);
 		});
 	});
 });
