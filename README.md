@@ -30,9 +30,9 @@ sagmal <text-to-translate>
 Then you will see the translated text in your terminal.
 
 
-## Specifying Languages
+## Language Options
 
-You can specify language options at the **first** or **last** position of your input using colon (`:`) syntax.
+You can specify language options at the **first** or **last** position of your input text using colon (`:`) syntax.
 
 The format is `[from]:[to]`.
 
@@ -53,25 +53,32 @@ Oh mon Dieu :en            # to English
 ja: 私は大丈夫です :vi      # from Japanese to Vietnamese
 ```
 
-
 ### Language Defaults
 
 - If you don't specify a source language in the CLI or config file, the DeepL API will detect it automatically.
 - If you don't specify a target language in either place, it will default to `en-US`.
 
 
-## Configuration
+## Other Options
+
+- `-c`, `--copy` : Copy translated text to clipboard (if available)
+- `-h`, `--help` : Show help message
+
+
+## Static Configuration
 
 You can configure the tool by creating a `.sagmalrc.json` file in either your home directory or the current directory.
 
 The configuration file must be in JSON format and can include:
 
+- `copyToClipboard`: Automatically copy translated text to clipboard.
 - `deepL.sourceLang`: The default source language code.
 - `deepL.targetLang`: The default target language code.
 - `deepL.options`: [Text translation options](https://github.com/deeplcom/deepl-node?tab=readme-ov-file#text-translation-options) that will be passed to the DeepL API.
 
 ```json
 {
+  "copyToClipboard": true,
   "deepL": {
     "sourceLang": "ja",
     "targetLang": "vi",
@@ -83,26 +90,6 @@ The configuration file must be in JSON format and can include:
     }
   }
 }
-```
-
-
-## Help message
-
-If no text is provided, or if the first argument is `--help` or `-h`, the tool will display a help message.
-
-```text
-Usage:
-  sagmal [languages] <text>
-  sagmal <text> [languages]
-  sagmal [language] <text> [language]
-Examples:
-  sagmal Bonjour tout le monde
-  sagmal de: Hallo Welt!
-  sagmal :it It's not a bug, it's a feature
-  sagmal fr:ar Je pense, donc je suis
-  sagmal I have made a terrible mistake :ja
-  sagmal 404 Motivation Not Found en:de
-  sagmal ja: 私は大丈夫です :zh-HANT
 ```
 
 

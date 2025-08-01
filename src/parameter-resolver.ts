@@ -13,6 +13,8 @@ export interface ResolvedTranslationParameters {
 	targetLanguage: deepl.TargetLanguageCode;
 	/** DeepL API options merged from configs */
 	translationOptions: Record<string, unknown>;
+	/** Whether to copy translated text to clipboard */
+	shouldCopyToClipboard: boolean;
 }
 
 /**
@@ -78,6 +80,17 @@ function resolveTargetLanguage(
 }
 
 /**
+ * Resolves clipboard copy preference with cascading priority.
+ * Priority order: CLI flag → local config → home config → false (default)
+ */
+function resolveCopyToClipboard(cliCopyFlag: boolean, configInputs: ConfigInputs): boolean {
+	if (cliCopyFlag) return true;
+	if (configInputs.localConfig.copyToClipboard) return true;
+	if (configInputs.homeConfig.copyToClipboard) return true;
+	return false;
+}
+
+/**
  * Merges DeepL API options from config files.
  * Local config options override home config options.
  * Validates that no internal-only fields are present.
@@ -108,33 +121,39 @@ function mergeTranslationOptions(configInputs: ConfigInputs): Record<string, unk
  * Centralized parameter resolution with complete cascading logic.
  *
  * Resolution priority (later overrides earlier):
- * 1. Default values (source: null/auto-detect, target: 'en-US')
+ * 1. Default values (source: null/auto-detect, target: 'en-US', copyToClipboard: false)
  * 2. Home directory config
  * 3. Local directory config
- * 4. CLI language arguments
+ * 4. CLI language arguments and flags
  *
  * Special handling:
  * - 'en' (case-insensitive) is normalized to 'en-US'
  * - DeepL options are merged (local overrides home)
+ * - Clipboard copy follows CLI flag → local config → home config → false
  *
- * @param cliLanguages - Parsed CLI language arguments (always provided, uses default object if no language specified)
+ * @param firstCliLanguages - Parsed CLI language arguments (always provided, uses default object if no language specified)
+ * @param lastCliLanguages - Parsed CLI language arguments (always provided, uses default object if no language specified)
  * @param configInputs - Configuration inputs from files (always provided, uses empty objects as defaults)
+ * @param cliCopyFlag - CLI copy flag from parsed arguments
  * @returns Fully resolved parameters ready for translation
  */
 export function resolveParameters(
 	firstCliLanguages: CliLanguageOptionData | null,
 	lastCliLanguages: CliLanguageOptionData | null,
 	configInputs: ConfigInputs,
+	cliCopyFlag: boolean,
 ): ResolvedTranslationParameters {
 	const mergedCliLanguages = mergeCliLanguageOptions(firstCliLanguages, lastCliLanguages);
 
 	const sourceLanguage = resolveSourceLanguage(mergedCliLanguages, configInputs);
 	const targetLanguage = resolveTargetLanguage(mergedCliLanguages, configInputs);
 	const translationOptions = mergeTranslationOptions(configInputs);
+	const shouldCopyToClipboard = resolveCopyToClipboard(cliCopyFlag, configInputs);
 
 	return {
 		sourceLanguage,
 		targetLanguage,
 		translationOptions,
+		shouldCopyToClipboard,
 	};
 }

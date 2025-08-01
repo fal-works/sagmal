@@ -17,6 +17,7 @@ export interface CliParseResult {
 	languageOptions: CliLanguageOptions;
 	text: string;
 	shouldShowHelp: boolean;
+	shouldCopyToClipboard: boolean;
 }
 
 /**
@@ -29,16 +30,22 @@ export function parseCliArguments(): CliParseResult {
 				type: "boolean",
 				short: "h",
 			},
+			copy: {
+				type: "boolean",
+				short: "c",
+			},
 		},
 		allowPositionals: true,
 	});
 
 	const shouldShowHelp = values.help || positionals.length === 0;
+	const shouldCopyToClipboard = values.copy ?? false;
 	const positionalResult = parseCliPositionals(positionals);
 
 	return {
 		...positionalResult,
 		shouldShowHelp,
+		shouldCopyToClipboard,
 	};
 }
 

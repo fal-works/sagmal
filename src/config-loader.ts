@@ -21,6 +21,8 @@ export interface DeepLConfigData {
 export interface SagmalRc {
 	/** DeepL API configuration */
 	deepL?: DeepLConfigData;
+	/** Whether to automatically copy translated text to clipboard */
+	copyToClipboard?: boolean;
 }
 
 /**

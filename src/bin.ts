@@ -2,6 +2,7 @@
 
 import { DeepLError } from "deepl-node";
 import { parseCliArguments } from "./cli-parser.ts";
+import { copyToClipboard } from "./clipboard.ts";
 import { loadConfigInputs } from "./config-loader.ts";
 import { getApiKey, loadEnvironment } from "./env-loader.ts";
 import { SagmalError, stringifyError } from "./errors.ts";
@@ -31,10 +32,15 @@ async function main(): Promise<void> {
 		parseResult.languageOptions.first,
 		parseResult.languageOptions.last,
 		configInputs,
+		parseResult.shouldCopyToClipboard,
 	);
 	const translatedText = await translate(apiKey, text, resolvedParams);
 
 	console.log(translatedText);
+
+	if (resolvedParams.shouldCopyToClipboard) {
+		await copyToClipboard(translatedText);
+	}
 }
 
 main().catch((error) => {
