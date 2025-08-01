@@ -27,7 +27,7 @@ Or, if you have installed it globally:
 sagmal <text-to-translate>
 ```
 
-Then you will see the translated text in your terminal.
+The translated text will then appear in your terminal.
 
 
 ## Language Options
@@ -49,14 +49,14 @@ Hallo Welt de:             # from German
 Oh mon Dieu :en            # to English
 私は大丈夫です ja:vi        # from Japanese to Vietnamese
 
-# Language options at both positions (confliction should be avoided)
+# Language options at both positions (avoid conflicts)
 ja: 私は大丈夫です :vi      # from Japanese to Vietnamese
 ```
 
 ### Language Defaults
 
-- If you don't specify a source language in the CLI or config file, the DeepL API will detect it automatically.
-- If you don't specify a target language in either place, it will default to `en-US`.
+- If you do not specify a source language in the CLI or config file, the DeepL API will detect it automatically.
+- If you do not specify a target language in the CLI or config file, it will default to `en-US`.
 
 
 ## Other Options
@@ -74,9 +74,9 @@ You can configure the tool by creating a `.sagmalrc.json` file in either your ho
 The configuration file must be in JSON format and can include:
 
 - `copyToClipboard`: Automatically copy translated text to clipboard.
-- `deepL.sourceLang`: The default source language code.
-- `deepL.targetLang`: The default target language code.
-- `deepL.targetLang2`: The second-default target language code. See [Second-Default Target Language](#second-default-target-language) for details.
+- `deepL.sourceLang`: The default [source language code](https://developers.deepl.com/docs/getting-started/supported-languages).
+- `deepL.targetLang`: The default [target language code](https://developers.deepl.com/docs/getting-started/supported-languages#translation-source-languages).
+- `deepL.targetLang2`: The secondary default target language code. See [Secondary Default Target Language](#secondary-default-target-language) for details.
 - `deepL.options`: [Text translation options](https://github.com/deeplcom/deepl-node?tab=readme-ov-file#text-translation-options) that will be passed to the DeepL API.
 
 ```json
@@ -96,25 +96,26 @@ The configuration file must be in JSON format and can include:
 }
 ```
 
-### Second-Default Target Language
+### Secondary Default Target Language
 
 The `targetLang2` option provides automatic fallback when sagmal assumes
 no meaningful translation occurred due to matching source and target languages.
-This commonly happens when inputting English text with default English target.
+This commonly happens when you input English text and the default target language is also English.
 
 **Example:**
 ```bash
 # Config: { "deepL": { "targetLang2": "de" } }
-sagmal "Hello world"  # → Detects English → Targets "de" instead of English → "Hallo Welt"
+sagmal Hello world
+# → Detects English → Targets "de" instead of English → "Hallo Welt"
 ```
 
 **Conditions:**
 - Target language not explicitly specified via CLI (`:en`, `de:`, etc.)
 - `targetLang2` configured in `.sagmalrc.json`
 - Detected source language matches resolved target language
-- Input/output text unchanged
+- Input and output text are unchanged
 
-**Note:** Uses simplified language matching (e.g., `en` matches `en-US`, but `en-US` ≠ `en-GB`) although it is not accurate for all cases.
+**Note:** Simplified language matching is used (e.g., `en` matches `en-US`, but `en-US` does not match `en-GB`), which may not be accurate in all cases.
 
 
 ## References
