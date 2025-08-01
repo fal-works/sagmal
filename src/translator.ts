@@ -1,11 +1,11 @@
-import * as deepl from "deepl-node";
+import { DeepLClient, type DeepLClientOptions } from "deepl-node";
 import * as packageJson from "../package.json" with { type: "json" };
 import type { ResolvedTranslationParameters } from "./parameter-resolver.ts";
 
 /**
  * DeepL API client options.
  */
-const clientOptions: deepl.DeepLClientOptions = {
+const clientOptions: DeepLClientOptions = {
 	appInfo: { appName: packageJson.name, appVersion: packageJson.version },
 };
 
@@ -22,7 +22,7 @@ export async function translate(
 	text: string,
 	params: ResolvedTranslationParameters,
 ): Promise<string> {
-	const client = new deepl.DeepLClient(apiKey, clientOptions);
+	const client = new DeepLClient(apiKey, clientOptions);
 
 	const result = await client.translateText(
 		text,
