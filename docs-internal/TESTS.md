@@ -1,4 +1,4 @@
-# Tests
+# Testing Guidelines
 
 ## Overview
 
