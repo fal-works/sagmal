@@ -8,5 +8,6 @@ export default defineConfig([
 		outDir: "dist",
 		platform: "node",
 		target: ["node22", "es2022"],
+		clean: true,
 	},
 ]);
