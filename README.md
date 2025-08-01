@@ -4,6 +4,8 @@ Command-line translation tool powered by the DeepL API.
 
 > "sagmal" comes from the German "Sag mal" ("say" or "tell me").
 
+Note: This is an early-stage project, primarily developed for personal use.
+
 ## Quick Start
 
 Save your DeepL API key in a `.env` file located either in the current directory or your home directory.  
@@ -100,3 +102,9 @@ Examples:
   sagmal 404 Motivation Not Found en:de
   sagmal ja: 私は大丈夫です :zh-HANT
 ```
+
+
+## References
+
+- DeepL API Documentation: <https://www.deepl.com/docs-api>
+- DeepL API for Node.js: <https://github.com/DeepLcom/deepl-node>
