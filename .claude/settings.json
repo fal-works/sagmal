@@ -11,6 +11,7 @@
 			"Bash(grep:*)",
 			"Bash(rm TMP_:*)",
 			"Bash(npx tsc:*)",
+			"Bash(git log:*)",
 			"Bash(git diff:*)"
 		],
 		"deny": ["Bash(pnpm run:*)"]
