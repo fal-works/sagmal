@@ -63,9 +63,18 @@ graph LR
 - **Output**: Fully resolved parameters ready for DeepL API
 
 #### `src/translator.ts` - DeepL API Integration
-- **Responsibility**: Translation function
+- **Responsibility**: Translation function with targetLang2 fallback logic
 - **Input**: API key + text + resolved parameters
 - **Output**: Translated text
+- **Key Behavior**: Automatically switches to targetLang2 under certain conditions
+
+#### `src/clipboard.ts` - Clipboard Integration
+- **Responsibility**: Cross-platform clipboard operations
+- **Key Behavior**: Silently handles clipboard copy failures as non-fatal
+
+#### `src/language-code.ts` - Language Code Utilities
+- **Responsibility**: Language code comparison and matching logic
+- **Usage**: Supports targetLang2 feature by determining if languages can be assumed as equivalent
 
 #### `src/help.ts` - Help Display
 - **Responsibility**: Display usage instructions
