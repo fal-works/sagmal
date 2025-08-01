@@ -1,10 +1,30 @@
 # @fal-works/sagmal
 
-Command-line translation tool powered by the DeepL API.
+CLI translation tool powered by the [DeepL API](https://developers.deepl.com/).
 
-> "sagmal" comes from the German "Sag mal" ("say" or "tell me").
+> “sagmal” comes from the German “Sag mal,” which means “say” or “tell me.”
 
 Note: This is an early-stage project, primarily developed for personal use.
+
+
+## In Short
+
+```text
+C:\> sagmal Oh mein Gott!   # Input any text after the command
+Oh my God!                  # Output (translated)
+```
+
+
+## Key Features
+
+- Simple CLI for instant text translation
+- Language selection via colon syntax (e.g., `de:`, `:en`), similar to [translate-shell](https://github.com/soimort/translate-shell)
+- Usually you don't need to quote the input text (unless it contains special characters or something)
+- Optionally copy results to the clipboard
+- Supports config files for persistent preferences, with JSON schema validation
+- Automatic fallback to a secondary target language
+- Works on Windows (and possibly other platforms, but I haven't tried them)
+
 
 ## Quick Start
 
