@@ -29,8 +29,7 @@ async function main(): Promise<void> {
 	}
 
 	const resolvedParams = resolveParameters(
-		parseResult.languageOptions.first,
-		parseResult.languageOptions.last,
+		parseResult.languageOptions,
 		configInputs,
 		parseResult.shouldCopyToClipboard,
 	);

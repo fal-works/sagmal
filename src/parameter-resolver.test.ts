@@ -10,7 +10,7 @@ describe("parameter-resolver", () => {
 		};
 
 		it("should use default values when no inputs provided", () => {
-			const result = resolveParameters(null, null, emptyConfig, false);
+			const result = resolveParameters({ first: null, last: null }, emptyConfig, false);
 
 			assert.strictEqual(result.sourceLanguage, null);
 			assert.strictEqual(result.targetLanguage, "en-US");
@@ -22,7 +22,7 @@ describe("parameter-resolver", () => {
 			const firstLang = { sourceLang: "ja", targetLang: null };
 			const lastLang = { sourceLang: null, targetLang: "fr" };
 
-			const result = resolveParameters(firstLang, lastLang, emptyConfig, false);
+			const result = resolveParameters({ first: firstLang, last: lastLang }, emptyConfig, false);
 
 			assert.strictEqual(result.sourceLanguage, "ja");
 			assert.strictEqual(result.targetLanguage, "fr");
@@ -32,7 +32,7 @@ describe("parameter-resolver", () => {
 			const firstLang = { sourceLang: "ja", targetLang: null };
 			const lastLang = { sourceLang: null, targetLang: "de" };
 
-			const result = resolveParameters(firstLang, lastLang, emptyConfig, false);
+			const result = resolveParameters({ first: firstLang, last: lastLang }, emptyConfig, false);
 
 			assert.strictEqual(result.sourceLanguage, "ja");
 			assert.strictEqual(result.targetLanguage, "de");
@@ -43,7 +43,7 @@ describe("parameter-resolver", () => {
 			const lastLang = { sourceLang: "fr", targetLang: null };
 
 			assert.throws(() => {
-				resolveParameters(firstLang, lastLang, emptyConfig, false);
+				resolveParameters({ first: firstLang, last: lastLang }, emptyConfig, false);
 			}, /Conflicting source languages: 'ja' and 'fr'/);
 		});
 
@@ -52,7 +52,7 @@ describe("parameter-resolver", () => {
 			const lastLang = { sourceLang: null, targetLang: "fr" };
 
 			assert.throws(() => {
-				resolveParameters(firstLang, lastLang, emptyConfig, false);
+				resolveParameters({ first: firstLang, last: lastLang }, emptyConfig, false);
 			}, /Conflicting target languages: 'en' and 'fr'/);
 		});
 
@@ -62,7 +62,7 @@ describe("parameter-resolver", () => {
 				localConfig: {},
 			};
 
-			const result = resolveParameters(null, null, config, false);
+			const result = resolveParameters({ first: null, last: null }, config, false);
 
 			assert.strictEqual(result.targetLanguage, "en-US");
 		});
@@ -73,7 +73,7 @@ describe("parameter-resolver", () => {
 				localConfig: {},
 			};
 
-			const result = resolveParameters(null, null, config, false);
+			const result = resolveParameters({ first: null, last: null }, config, false);
 
 			assert.strictEqual(result.targetLanguage, "en-US");
 		});
@@ -86,15 +86,14 @@ describe("parameter-resolver", () => {
 
 			// CLI overrides config
 			const resultCli = resolveParameters(
-				{ sourceLang: "de", targetLang: null },
-				null,
+				{ first: { sourceLang: "de", targetLang: null }, last: null },
 				config,
 				false,
 			);
 			assert.strictEqual(resultCli.sourceLanguage, "de");
 
 			// Local config overrides home config
-			const resultConfig = resolveParameters(null, null, config, false);
+			const resultConfig = resolveParameters({ first: null, last: null }, config, false);
 			assert.strictEqual(resultConfig.sourceLanguage, "fr");
 
 			// Home config as fallback
@@ -102,7 +101,7 @@ describe("parameter-resolver", () => {
 				homeConfig: { deepL: { sourceLang: "ja" } },
 				localConfig: {},
 			};
-			const resultHome = resolveParameters(null, null, configHomeOnly, false);
+			const resultHome = resolveParameters({ first: null, last: null }, configHomeOnly, false);
 			assert.strictEqual(resultHome.sourceLanguage, "ja");
 		});
 
@@ -114,15 +113,14 @@ describe("parameter-resolver", () => {
 
 			// CLI overrides config
 			const resultCli = resolveParameters(
-				{ sourceLang: null, targetLang: "de" },
-				null,
+				{ first: { sourceLang: null, targetLang: "de" }, last: null },
 				config,
 				false,
 			);
 			assert.strictEqual(resultCli.targetLanguage, "de");
 
 			// Local config overrides home config
-			const resultConfig = resolveParameters(null, null, config, false);
+			const resultConfig = resolveParameters({ first: null, last: null }, config, false);
 			assert.strictEqual(resultConfig.targetLanguage, "fr");
 
 			// Home config as fallback
@@ -130,7 +128,7 @@ describe("parameter-resolver", () => {
 				homeConfig: { deepL: { targetLang: "ja" } },
 				localConfig: {},
 			};
-			const resultHome = resolveParameters(null, null, configHomeOnly, false);
+			const resultHome = resolveParameters({ first: null, last: null }, configHomeOnly, false);
 			assert.strictEqual(resultHome.targetLanguage, "ja");
 		});
 
@@ -154,7 +152,7 @@ describe("parameter-resolver", () => {
 				},
 			};
 
-			const result = resolveParameters(null, null, config, false);
+			const result = resolveParameters({ first: null, last: null }, config, false);
 
 			assert.deepStrictEqual(result.translationOptions, {
 				formality: "less", // local overrides home
@@ -164,7 +162,7 @@ describe("parameter-resolver", () => {
 		});
 
 		it("should resolve clipboard copy from CLI flag", () => {
-			const result = resolveParameters(null, null, emptyConfig, true);
+			const result = resolveParameters({ first: null, last: null }, emptyConfig, true);
 			assert.strictEqual(result.shouldCopyToClipboard, true);
 		});
 
@@ -174,7 +172,7 @@ describe("parameter-resolver", () => {
 				localConfig: { copyToClipboard: true },
 			};
 
-			const result = resolveParameters(null, null, config, false);
+			const result = resolveParameters({ first: null, last: null }, config, false);
 			assert.strictEqual(result.shouldCopyToClipboard, true);
 		});
 
@@ -184,7 +182,7 @@ describe("parameter-resolver", () => {
 				localConfig: {},
 			};
 
-			const result = resolveParameters(null, null, config, false);
+			const result = resolveParameters({ first: null, last: null }, config, false);
 			assert.strictEqual(result.shouldCopyToClipboard, true);
 		});
 
@@ -194,7 +192,7 @@ describe("parameter-resolver", () => {
 				localConfig: { copyToClipboard: false },
 			};
 
-			const result = resolveParameters(null, null, config, true);
+			const result = resolveParameters({ first: null, last: null }, config, true);
 			assert.strictEqual(result.shouldCopyToClipboard, true);
 		});
 
@@ -204,7 +202,7 @@ describe("parameter-resolver", () => {
 				localConfig: { copyToClipboard: true },
 			};
 
-			const result = resolveParameters(null, null, config, false);
+			const result = resolveParameters({ first: null, last: null }, config, false);
 			assert.strictEqual(result.shouldCopyToClipboard, true);
 
 			// Test that local config with undefined/missing value falls back to home
@@ -213,7 +211,7 @@ describe("parameter-resolver", () => {
 				localConfig: {},
 			};
 
-			const resultFallback = resolveParameters(null, null, configFallback, false);
+			const resultFallback = resolveParameters({ first: null, last: null }, configFallback, false);
 			assert.strictEqual(resultFallback.shouldCopyToClipboard, true);
 		});
 
@@ -231,7 +229,7 @@ describe("parameter-resolver", () => {
 			};
 
 			assert.throws(() => {
-				resolveParameters(null, null, config, false);
+				resolveParameters({ first: null, last: null }, config, false);
 			}, /Invalid config: '__path' is an internal-only field/);
 		});
 
@@ -249,7 +247,7 @@ describe("parameter-resolver", () => {
 			};
 
 			assert.throws(() => {
-				resolveParameters(null, null, config, false);
+				resolveParameters({ first: null, last: null }, config, false);
 			}, /Invalid config: '__path' is an internal-only field/);
 		});
 	});

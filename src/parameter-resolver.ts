@@ -1,5 +1,5 @@
 import type * as deepl from "deepl-node";
-import type { CliLanguageOptionData } from "./cli-language-parser.ts";
+import type { CliLanguageOptionData, CliLanguageOptions } from "./cli-language-parser.ts";
 import type { ConfigInputs } from "./config-loader.ts";
 import { SagmalError } from "./errors.ts";
 
@@ -18,12 +18,106 @@ export interface ResolvedTranslationParameters {
 }
 
 /**
+ * Parameter layer for cascading resolution.
+ * All fields are optional to allow partial specification at each layer.
+ */
+interface ParameterLayer {
+	/** Source language (null = auto-detect) */
+	sourceLanguage?: deepl.SourceLanguageCode | null;
+	/** Target language */
+	targetLanguage?: deepl.TargetLanguageCode;
+	/** DeepL API options */
+	translationOptions: Record<string, unknown>;
+	/** Whether to copy translated text to clipboard */
+	shouldCopyToClipboard?: boolean;
+}
+
+/**
+ * Coalesces a property from two parameter layers, with higher priority taking precedence.
+ */
+function coalesceProperty<T, K extends keyof T>(target: T, lower: T, higher: T, key: K): void {
+	if (higher[key] !== undefined) target[key] = higher[key];
+	else if (lower[key] !== undefined) target[key] = lower[key];
+}
+
+/**
+ * Merges two parameter layers with the second layer taking priority.
+ *
+ * @param lower - Lower priority layer
+ * @param higher - Higher priority layer (overrides lower)
+ * @returns Merged parameter layer
+ */
+function mergeParameterLayers(lower: ParameterLayer, higher: ParameterLayer): ParameterLayer {
+	const result: ParameterLayer = {
+		translationOptions: {
+			...lower.translationOptions,
+			...higher.translationOptions,
+		},
+	};
+
+	coalesceProperty(result, lower, higher, "sourceLanguage");
+	coalesceProperty(result, lower, higher, "targetLanguage");
+	coalesceProperty(result, lower, higher, "shouldCopyToClipboard");
+
+	return result;
+}
+
+/**
+ * Creates the default parameter layer.
+ */
+function createDefaultLayer(): ParameterLayer {
+	return {
+		sourceLanguage: null, // auto-detect
+		targetLanguage: "en-US",
+		translationOptions: {},
+		shouldCopyToClipboard: false,
+	};
+}
+
+/**
+ * Creates parameter layer from config object.
+ */
+function createConfigLayer(
+	config: ConfigInputs["homeConfig"] | ConfigInputs["localConfig"],
+): ParameterLayer {
+	const result: ParameterLayer = {
+		translationOptions: config.deepL?.options ?? {},
+	};
+
+	if (config.deepL?.sourceLang)
+		result.sourceLanguage = config.deepL.sourceLang as deepl.SourceLanguageCode;
+	if (config.deepL?.targetLang)
+		result.targetLanguage = config.deepL.targetLang as deepl.TargetLanguageCode;
+	if (config.copyToClipboard !== undefined) result.shouldCopyToClipboard = config.copyToClipboard;
+
+	return result;
+}
+
+/**
+ * Creates parameter layer from CLI arguments.
+ */
+function createCliLayer(
+	mergedCliLanguages: CliLanguageOptionData,
+	cliCopyFlag: boolean,
+): ParameterLayer {
+	const result: ParameterLayer = {
+		translationOptions: {}, // CLI does not specify any text translation options
+	};
+
+	if (mergedCliLanguages.sourceLang)
+		result.sourceLanguage = mergedCliLanguages.sourceLang as deepl.SourceLanguageCode;
+	if (mergedCliLanguages.targetLang)
+		result.targetLanguage = mergedCliLanguages.targetLang as deepl.TargetLanguageCode;
+	if (cliCopyFlag) result.shouldCopyToClipboard = true;
+
+	return result;
+}
+
+/**
  * Merges multiple CLI language options with conflict detection.
  */
-function mergeCliLanguageOptions(
-	firstLang: CliLanguageOptionData | null,
-	lastLang: CliLanguageOptionData | null,
-): CliLanguageOptionData {
+function mergeCliLanguageOptions(cliLanguages: CliLanguageOptions): CliLanguageOptionData {
+	const { first: firstLang, last: lastLang } = cliLanguages;
 	const firstSource = firstLang?.sourceLang ?? null;
 	const firstTarget = firstLang?.targetLang ?? null;
 	const lastSource = lastLang?.sourceLang ?? null;
@@ -44,62 +138,17 @@ function mergeCliLanguageOptions(
 }
 
 /**
- * Resolves source language with cascading priority.
- * Priority order: CLI → local config → home config → null (auto-detect)
+ * Applies post-processing to the merged parameter layer.
+ * Handles normalization, validation, and type conversion.
  */
-function resolveSourceLanguage(
-	cliLanguages: CliLanguageOptionData,
+function applyPostProcessing(
+	resolved: ParameterLayer,
 	configInputs: ConfigInputs,
-): deepl.SourceLanguageCode | null {
-	let src = null;
-	src ??= cliLanguages.sourceLang;
-	src ??= configInputs.localConfig.deepL?.sourceLang;
-	src ??= configInputs.homeConfig.deepL?.sourceLang;
-	src ??= null; // Prevent undefined
-
-	return src as deepl.SourceLanguageCode | null;
-}
-
-/**
- * Resolves target language with cascading priority.
- * Priority order: CLI → local config → home config → 'en-US' (default)
- * Also normalizes 'en' to 'en-US'.
- */
-function resolveTargetLanguage(
-	cliLanguages: CliLanguageOptionData,
-	configInputs: ConfigInputs,
-): deepl.TargetLanguageCode {
-	let target = null;
-	target ??= cliLanguages.targetLang;
-	target ??= configInputs.localConfig.deepL?.targetLang;
-	target ??= configInputs.homeConfig.deepL?.targetLang;
-	target ??= "en-US";
-	if (target.toLowerCase() === "en") target = "en-US";
-
-	return target as deepl.TargetLanguageCode;
-}
-
-/**
- * Resolves clipboard copy preference with cascading priority.
- * Priority order: CLI flag → local config → home config → false (default)
- */
-function resolveCopyToClipboard(cliCopyFlag: boolean, configInputs: ConfigInputs): boolean {
-	if (cliCopyFlag) return true;
-	if (configInputs.localConfig.copyToClipboard) return true;
-	if (configInputs.homeConfig.copyToClipboard) return true;
-	return false;
-}
-
-/**
- * Merges DeepL API options from config files.
- * Local config options override home config options.
- * Validates that no internal-only fields are present.
- */
-function mergeTranslationOptions(configInputs: ConfigInputs): Record<string, unknown> {
+): ResolvedTranslationParameters {
+	// Validate translation options for internal-only fields
 	const homeOptions = configInputs.homeConfig.deepL?.options;
 	const localOptions = configInputs.localConfig.deepL?.options;
 
-	// Validate no internal-only fields
 	if (homeOptions && "__path" in homeOptions) {
 		throw new SagmalError(
 			"Invalid config: '__path' is an internal-only field and cannot be used in configuration",
@@ -111,9 +160,18 @@ function mergeTranslationOptions(configInputs: ConfigInputs): Record<string, unk
 		);
 	}
 
+	// Normalize target language ('en' -> 'en-US')
+	// At this point targetLanguage is guaranteed to exist due to default layer
+	const targetLanguage = resolved.targetLanguage ?? "en-US";
+	const normalizedTarget = targetLanguage.toLowerCase() === "en" ? "en-US" : targetLanguage;
+
+	// Convert to final resolved parameters with guaranteed values
+	// These values are guaranteed to exist due to default layer providing fallbacks
 	return {
-		...homeOptions,
-		...localOptions,
+		sourceLanguage: resolved.sourceLanguage ?? null, // null is valid (auto-detect)
+		targetLanguage: normalizedTarget,
+		translationOptions: resolved.translationOptions ?? {},
+		shouldCopyToClipboard: resolved.shouldCopyToClipboard ?? false,
 	};
 }
 
@@ -131,29 +189,33 @@ function mergeTranslationOptions(configInputs: ConfigInputs): Record<string, unk
  * - DeepL options are merged (local overrides home)
  * - Clipboard copy follows CLI flag → local config → home config → false
  *
- * @param firstCliLanguages - Parsed CLI language arguments (always provided, uses default object if no language specified)
- * @param lastCliLanguages - Parsed CLI language arguments (always provided, uses default object if no language specified)
+ * @param cliLanguages - CLI language options from both positions
  * @param configInputs - Configuration inputs from files (always provided, uses empty objects as defaults)
  * @param cliCopyFlag - CLI copy flag from parsed arguments
  * @returns Fully resolved parameters ready for translation
  */
 export function resolveParameters(
-	firstCliLanguages: CliLanguageOptionData | null,
-	lastCliLanguages: CliLanguageOptionData | null,
+	cliLanguages: CliLanguageOptions,
 	configInputs: ConfigInputs,
 	cliCopyFlag: boolean,
 ): ResolvedTranslationParameters {
-	const mergedCliLanguages = mergeCliLanguageOptions(firstCliLanguages, lastCliLanguages);
+	// Step 1: Merge CLI language options with conflict detection
+	const mergedCliLanguages = mergeCliLanguageOptions(cliLanguages);
 
-	const sourceLanguage = resolveSourceLanguage(mergedCliLanguages, configInputs);
-	const targetLanguage = resolveTargetLanguage(mergedCliLanguages, configInputs);
-	const translationOptions = mergeTranslationOptions(configInputs);
-	const shouldCopyToClipboard = resolveCopyToClipboard(cliCopyFlag, configInputs);
+	// Step 2: Create parameter layers for each priority level
+	const defaultLayer = createDefaultLayer();
+	const homeLayer = createConfigLayer(configInputs.homeConfig);
+	const localLayer = createConfigLayer(configInputs.localConfig);
+	const cliLayer = createCliLayer(mergedCliLanguages, cliCopyFlag);
 
-	return {
-		sourceLanguage,
-		targetLanguage,
-		translationOptions,
-		shouldCopyToClipboard,
-	};
+	// Step 3: Apply cascading priority through sequential merging
+	let resolved = defaultLayer;
+	resolved = mergeParameterLayers(resolved, homeLayer);
+	resolved = mergeParameterLayers(resolved, localLayer);
+	resolved = mergeParameterLayers(resolved, cliLayer);
+
+	// Step 4: Apply post-processing and validation
+	const finalResult = applyPostProcessing(resolved, configInputs);
+
+	return finalResult;
 }
