@@ -4,6 +4,7 @@
 			"Bash(npm run check:*)",
 			"Bash(npm run fix:*)",
 			"Bash(npm run build:*)",
+			"Bash(npm run test:unit:*)",
 			"Bash(touch:*)",
 			"Bash(mkdir:*)",
 			"Bash(find:*)",
