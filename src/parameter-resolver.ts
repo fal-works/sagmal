@@ -11,7 +11,7 @@ export interface ResolvedTranslationParameters {
 	sourceLanguage: deepl.SourceLanguageCode | null;
 	/** Target language (guaranteed to exist, normalized) */
 	targetLanguage: deepl.TargetLanguageCode;
-	/** Second-default target language */
+	/** Secondary default target language */
 	targetLanguageSecond: deepl.TargetLanguageCode | null;
 	/** Whether target language was explicitly specified via CLI */
 	isTargetLanguageFromCli: boolean;
@@ -30,7 +30,7 @@ interface ParameterLayer {
 	sourceLanguage?: deepl.SourceLanguageCode | null;
 	/** Target language */
 	targetLanguage?: deepl.TargetLanguageCode;
-	/** Second-default target language */
+	/** Secondary default target language */
 	targetLanguageSecond?: deepl.TargetLanguageCode | null;
 	/** DeepL API options */
 	translationOptions: Record<string, unknown>;

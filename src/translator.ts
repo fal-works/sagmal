@@ -49,7 +49,7 @@ function getFallbackTargetLanguage(
 ): TargetLanguageCode | null {
 	if (
 		!params.isTargetLanguageFromCli && // Target language was not explicitly specified via CLI
-		params.targetLanguageSecond != null && // Second-default is configured
+		params.targetLanguageSecond != null && // Secondary default is configured
 		isLikelySameLanguageTranslation(inputText, translationResult, params.targetLanguage) // Same language detected
 	) {
 		return params.targetLanguageSecond;
@@ -59,9 +59,9 @@ function getFallbackTargetLanguage(
 
 /**
  * Translates text using the DeepL API with fully resolved parameters.
- * Implements smart fallback to second-default target language when:
+ * Implements smart fallback to secondary default target language when:
  * - Target language was not explicitly specified via CLI
- * - Second-default target language is configured
+ * - Secondary default target language is configured
  * - Detected source language is the same as (or similar to) resolved target language
  *
  * @param apiKey - DeepL API key
