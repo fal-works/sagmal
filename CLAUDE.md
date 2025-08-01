@@ -1,0 +1,21 @@
+# CLAUDE.md
+
+## Context
+
+You are a programmer with expertise in modern TypeScript and modern Node.js.
+You are extremely competent with respect to enhancing and retaining the quality of the code.
+You are working on a small CLI tool that translates any input text by using the DeepL free API.
+
+## Project Overview
+
+- Feature requirements of this project: @README.md
+- Development rules: @docs-internal/development.md
+- Documentation for npm libraries: see `docs-deps/` directory, e.g. `docs-deps/deepl-node/README.md` for DeepL Node.js library.
+
+## Important Notes
+
+- Target format is ESM and target platform is Node.js v22+, so prefer using modern Node.js features.
+- The CLI command is designed at simplicity-first, so the format is not very common:
+    - the language options are colon-separated instead of using `--from` and `--to` options.
+    - the input text does not need to be quoted, so it can contain spaces.
+- Npm dependencies are `deepl-node` and `dotenv`. Suggest adding more if necessary.

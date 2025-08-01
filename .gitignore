@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Environment files
+/.env
+
+# Build outputs
+dist/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+pnpm-debug.log*
+
+# Temporary folders
+/test-out/
+/local/
+/tmp/
+/docs-deps/
