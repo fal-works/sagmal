@@ -8,7 +8,7 @@ You are working on a small CLI tool that translates any input text by using the 
 
 ## Project Overview
 
-- Feature requirements of this project: @README.md
+- Overview and features of this tool: @README.md
 - Development rules: @docs-internal/development.md
 - Architecture overview: @docs-internal/architecture.md
 - Documentation for npm libraries: see `docs-deps/` directory, e.g. `docs-deps/deepl-node/README.md` for DeepL Node.js library.
