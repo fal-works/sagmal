@@ -5,8 +5,8 @@ import { resolveParameters } from "./parameter-resolver.ts";
 describe("parameter-resolver", () => {
 	describe("resolveParameters", () => {
 		const emptyConfig = {
-			homeConfig: {},
-			localConfig: {},
+			home: {},
+			local: {},
 		};
 
 		it("should use default values when no inputs provided", () => {
@@ -58,8 +58,8 @@ describe("parameter-resolver", () => {
 
 		it("should normalize 'en' to 'en-US'", () => {
 			const config = {
-				homeConfig: { deepL: { targetLang: "en" } },
-				localConfig: {},
+				home: { deepL: { targetLang: "en" } },
+				local: {},
 			};
 
 			const result = resolveParameters({ first: null, last: null }, config, false);
@@ -69,8 +69,8 @@ describe("parameter-resolver", () => {
 
 		it("should normalize 'EN' to 'en-US' (case insensitive)", () => {
 			const config = {
-				homeConfig: { deepL: { targetLang: "EN" } },
-				localConfig: {},
+				home: { deepL: { targetLang: "EN" } },
+				local: {},
 			};
 
 			const result = resolveParameters({ first: null, last: null }, config, false);
@@ -80,8 +80,8 @@ describe("parameter-resolver", () => {
 
 		it("should use cascading priority for source language", () => {
 			const config = {
-				homeConfig: { deepL: { sourceLang: "ja" } },
-				localConfig: { deepL: { sourceLang: "fr" } },
+				home: { deepL: { sourceLang: "ja" } },
+				local: { deepL: { sourceLang: "fr" } },
 			};
 
 			// CLI overrides config
@@ -98,8 +98,8 @@ describe("parameter-resolver", () => {
 
 			// Home config as fallback
 			const configHomeOnly = {
-				homeConfig: { deepL: { sourceLang: "ja" } },
-				localConfig: {},
+				home: { deepL: { sourceLang: "ja" } },
+				local: {},
 			};
 			const resultHome = resolveParameters({ first: null, last: null }, configHomeOnly, false);
 			assert.strictEqual(resultHome.sourceLanguage, "ja");
@@ -107,8 +107,8 @@ describe("parameter-resolver", () => {
 
 		it("should use cascading priority for target language", () => {
 			const config = {
-				homeConfig: { deepL: { targetLang: "ja" } },
-				localConfig: { deepL: { targetLang: "fr" } },
+				home: { deepL: { targetLang: "ja" } },
+				local: { deepL: { targetLang: "fr" } },
 			};
 
 			// CLI overrides config
@@ -125,8 +125,8 @@ describe("parameter-resolver", () => {
 
 			// Home config as fallback
 			const configHomeOnly = {
-				homeConfig: { deepL: { targetLang: "ja" } },
-				localConfig: {},
+				home: { deepL: { targetLang: "ja" } },
+				local: {},
 			};
 			const resultHome = resolveParameters({ first: null, last: null }, configHomeOnly, false);
 			assert.strictEqual(resultHome.targetLanguage, "ja");
@@ -134,7 +134,7 @@ describe("parameter-resolver", () => {
 
 		it("should merge DeepL options with local overriding home", () => {
 			const config = {
-				homeConfig: {
+				home: {
 					deepL: {
 						options: {
 							formality: "more",
@@ -142,7 +142,7 @@ describe("parameter-resolver", () => {
 						},
 					},
 				},
-				localConfig: {
+				local: {
 					deepL: {
 						options: {
 							formality: "less", // overrides home
@@ -168,8 +168,8 @@ describe("parameter-resolver", () => {
 
 		it("should resolve clipboard copy from local config", () => {
 			const config = {
-				homeConfig: {},
-				localConfig: { copyToClipboard: true },
+				home: {},
+				local: { copyToClipboard: true },
 			};
 
 			const result = resolveParameters({ first: null, last: null }, config, false);
@@ -178,8 +178,8 @@ describe("parameter-resolver", () => {
 
 		it("should resolve clipboard copy from home config", () => {
 			const config = {
-				homeConfig: { copyToClipboard: true },
-				localConfig: {},
+				home: { copyToClipboard: true },
+				local: {},
 			};
 
 			const result = resolveParameters({ first: null, last: null }, config, false);
@@ -188,8 +188,8 @@ describe("parameter-resolver", () => {
 
 		it("should prioritize CLI flag over config for clipboard copy", () => {
 			const config = {
-				homeConfig: { copyToClipboard: false },
-				localConfig: { copyToClipboard: false },
+				home: { copyToClipboard: false },
+				local: { copyToClipboard: false },
 			};
 
 			const result = resolveParameters({ first: null, last: null }, config, true);
@@ -198,8 +198,8 @@ describe("parameter-resolver", () => {
 
 		it("should prioritize local config over home config for clipboard copy", () => {
 			const config = {
-				homeConfig: { copyToClipboard: true },
-				localConfig: { copyToClipboard: true },
+				home: { copyToClipboard: true },
+				local: { copyToClipboard: true },
 			};
 
 			const result = resolveParameters({ first: null, last: null }, config, false);
@@ -207,8 +207,8 @@ describe("parameter-resolver", () => {
 
 			// Test that local config with undefined/missing value falls back to home
 			const configFallback = {
-				homeConfig: { copyToClipboard: true },
-				localConfig: {},
+				home: { copyToClipboard: true },
+				local: {},
 			};
 
 			const resultFallback = resolveParameters({ first: null, last: null }, configFallback, false);
@@ -217,7 +217,7 @@ describe("parameter-resolver", () => {
 
 		it("should throw error for __path in home config options", () => {
 			const config = {
-				homeConfig: {
+				home: {
 					deepL: {
 						options: {
 							__path: "invalid",
@@ -225,7 +225,7 @@ describe("parameter-resolver", () => {
 						},
 					},
 				},
-				localConfig: {},
+				local: {},
 			};
 
 			assert.throws(() => {
@@ -235,8 +235,8 @@ describe("parameter-resolver", () => {
 
 		it("should throw error for __path in local config options", () => {
 			const config = {
-				homeConfig: {},
-				localConfig: {
+				home: {},
+				local: {
 					deepL: {
 						options: {
 							__path: "invalid",

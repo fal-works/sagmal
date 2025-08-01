@@ -1,6 +1,6 @@
 import type * as deepl from "deepl-node";
 import type { CliLanguageOptionData, CliLanguageOptions } from "./cli-language-parser.ts";
-import type { ConfigInputs } from "./config-loader.ts";
+import type { SagmalRcInputs } from "./config-loader.ts";
 import { SagmalError } from "./errors.ts";
 
 /**
@@ -85,7 +85,7 @@ function createDefaultLayer(): ParameterLayer {
  * Creates parameter layer from config object.
  */
 function createConfigLayer(
-	config: ConfigInputs["homeConfig"] | ConfigInputs["localConfig"],
+	config: SagmalRcInputs["home"] | SagmalRcInputs["local"],
 ): ParameterLayer {
 	const result: ParameterLayer = {
 		translationOptions: config.deepL?.options ?? {},
@@ -154,11 +154,11 @@ function mergeCliLanguageOptions(cliLanguages: CliLanguageOptions): CliLanguageO
  */
 function applyPostProcessing(
 	resolved: ParameterLayer,
-	configInputs: ConfigInputs,
+	sagmalRcInputs: SagmalRcInputs,
 ): ResolvedTranslationParameters {
 	// Validate translation options for internal-only fields
-	const homeOptions = configInputs.homeConfig.deepL?.options;
-	const localOptions = configInputs.localConfig.deepL?.options;
+	const homeOptions = sagmalRcInputs.home.deepL?.options;
+	const localOptions = sagmalRcInputs.local.deepL?.options;
 
 	if (homeOptions && "__path" in homeOptions) {
 		throw new SagmalError(
@@ -197,13 +197,13 @@ function applyPostProcessing(
  * - Clipboard copy follows CLI flag → local config → home config → false
  *
  * @param cliLanguages - CLI language options from both positions
- * @param configInputs - Configuration inputs from files (always provided, uses empty objects as defaults)
+ * @param sagmalRcInputs - Configuration inputs from files (always provided, uses empty objects as defaults)
  * @param cliCopyFlag - CLI copy flag from parsed arguments
  * @returns Fully resolved parameters ready for translation
  */
 export function resolveParameters(
 	cliLanguages: CliLanguageOptions,
-	configInputs: ConfigInputs,
+	sagmalRcInputs: SagmalRcInputs,
 	cliCopyFlag: boolean,
 ): ResolvedTranslationParameters {
 	// Step 1: Merge CLI language options with conflict detection
@@ -211,8 +211,8 @@ export function resolveParameters(
 
 	// Step 2: Create parameter layers for each priority level
 	const defaultLayer = createDefaultLayer();
-	const homeLayer = createConfigLayer(configInputs.homeConfig);
-	const localLayer = createConfigLayer(configInputs.localConfig);
+	const homeLayer = createConfigLayer(sagmalRcInputs.home);
+	const localLayer = createConfigLayer(sagmalRcInputs.local);
 	const cliLayer = createCliLayer(mergedCliLanguages, cliCopyFlag);
 
 	// Step 3: Apply cascading priority through sequential merging
@@ -222,7 +222,7 @@ export function resolveParameters(
 	resolved = mergeParameterLayers(resolved, cliLayer);
 
 	// Step 4: Apply post-processing and validation
-	const finalResult = applyPostProcessing(resolved, configInputs);
+	const finalResult = applyPostProcessing(resolved, sagmalRcInputs);
 
 	return finalResult;
 }

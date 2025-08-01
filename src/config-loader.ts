@@ -28,11 +28,11 @@ export interface SagmalRc {
 /**
  * Configuration inputs loaded from files (no merging applied).
  */
-export interface ConfigInputs {
+export interface SagmalRcInputs {
 	/** Raw config from home directory .sagmalrc.json (empty object if not present) */
-	homeConfig: SagmalRc;
+	home: SagmalRc;
 	/** Raw config from current directory .sagmalrc.json (empty object if not present) */
-	localConfig: SagmalRc;
+	local: SagmalRc;
 }
 
 /**
@@ -107,13 +107,13 @@ function loadConfigFile(path: string): SagmalRc | undefined {
  *
  * @returns Configuration inputs (no merging applied, uses empty objects as defaults)
  */
-export function loadConfigInputs(): ConfigInputs {
+export function loadSagmalRcInputs(): SagmalRcInputs {
 	const homeDir = homedir();
 	const homeConfig = loadConfigFile(join(homeDir, ".sagmalrc.json"));
 	const localConfig = loadConfigFile(join(process.cwd(), ".sagmalrc.json"));
 
 	return {
-		homeConfig: homeConfig ?? {},
-		localConfig: localConfig ?? {},
+		home: homeConfig ?? {},
+		local: localConfig ?? {},
 	};
 }
