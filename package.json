@@ -4,7 +4,7 @@
 	"description": "CLI for text translation using DeepL API",
 	"type": "module",
 	"bin": {
-		"sagmal": "./dist/bin.js"
+		"sagmal": "dist/bin.js"
 	},
 	"sideEffects": false,
 	"files": [
