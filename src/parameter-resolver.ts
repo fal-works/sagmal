@@ -11,6 +11,10 @@ export interface ResolvedTranslationParameters {
 	sourceLanguage: deepl.SourceLanguageCode | null;
 	/** Target language (guaranteed to exist, normalized) */
 	targetLanguage: deepl.TargetLanguageCode;
+	/** Second-default target language */
+	targetLanguageSecond: deepl.TargetLanguageCode | null;
+	/** Whether target language was explicitly specified via CLI */
+	isTargetLanguageFromCli: boolean;
 	/** DeepL API options merged from configs */
 	translationOptions: Record<string, unknown>;
 	/** Whether to copy translated text to clipboard */
@@ -26,6 +30,8 @@ interface ParameterLayer {
 	sourceLanguage?: deepl.SourceLanguageCode | null;
 	/** Target language */
 	targetLanguage?: deepl.TargetLanguageCode;
+	/** Second-default target language */
+	targetLanguageSecond?: deepl.TargetLanguageCode | null;
 	/** DeepL API options */
 	translationOptions: Record<string, unknown>;
 	/** Whether to copy translated text to clipboard */
@@ -64,6 +70,7 @@ function mergeParameterLayers(lower: ParameterLayer, higher: ParameterLayer): Pa
 
 	coalesceProperty(result, lower, higher, "sourceLanguage");
 	coalesceProperty(result, lower, higher, "targetLanguage");
+	coalesceProperty(result, lower, higher, "targetLanguageSecond");
 	coalesceProperty(result, lower, higher, "shouldCopyToClipboard");
 
 	return result;
@@ -76,6 +83,7 @@ function createDefaultLayer(): ParameterLayer {
 	return {
 		sourceLanguage: null, // auto-detect
 		targetLanguage: "en-US",
+		targetLanguageSecond: null,
 		translationOptions: {},
 		shouldCopyToClipboard: false,
 	};
@@ -96,6 +104,10 @@ function createConfigLayer(
 	if (config.deepL?.targetLang)
 		result.targetLanguage = normalizeTargetLanguage(
 			config.deepL.targetLang,
+		) as deepl.TargetLanguageCode;
+	if (config.deepL?.targetLang2)
+		result.targetLanguageSecond = normalizeTargetLanguage(
+			config.deepL.targetLang2,
 		) as deepl.TargetLanguageCode;
 	if (config.copyToClipboard !== undefined) result.shouldCopyToClipboard = config.copyToClipboard;
 
@@ -177,6 +189,8 @@ function applyPostProcessing(
 	return {
 		sourceLanguage: resolved.sourceLanguage ?? null, // null is valid (auto-detect)
 		targetLanguage: resolved.targetLanguage ?? "en-US",
+		targetLanguageSecond: resolved.targetLanguageSecond ?? null,
+		isTargetLanguageFromCli: false, // Will be updated below
 		translationOptions: resolved.translationOptions ?? {},
 		shouldCopyToClipboard: resolved.shouldCopyToClipboard ?? false,
 	};
@@ -223,6 +237,9 @@ export function resolveParameters(
 
 	// Step 4: Apply post-processing and validation
 	const finalResult = applyPostProcessing(resolved, sagmalRcInputs);
+
+	// Step 5: Determine if target language was explicitly specified via CLI
+	finalResult.isTargetLanguageFromCli = mergedCliLanguages.targetLang != null;
 
 	return finalResult;
 }

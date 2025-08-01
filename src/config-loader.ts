@@ -11,6 +11,8 @@ export interface DeepLConfigData {
 	sourceLang?: string;
 	/** Target language code */
 	targetLang?: string;
+	/** Second-default target language code */
+	targetLang2?: string;
 	/** DeepL API options (formality, context, modelType, etc.) */
 	options?: Record<string, unknown>;
 }

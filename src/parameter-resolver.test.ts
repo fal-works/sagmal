@@ -250,5 +250,82 @@ describe("parameter-resolver", () => {
 				resolveParameters({ first: null, last: null }, config, false);
 			}, /Invalid \.sagmalrc .* directory: '__path' is an internal-only field/);
 		});
+
+		it("should resolve targetLang2 from config", () => {
+			const config = {
+				home: {
+					deepL: {
+						targetLang: "en-US",
+						targetLang2: "ja",
+					},
+				},
+				local: {},
+			};
+
+			const result = resolveParameters({ first: null, last: null }, config, false);
+
+			assert.strictEqual(result.targetLanguage, "en-US");
+			assert.strictEqual(result.targetLanguageSecond, "ja");
+			assert.strictEqual(result.isTargetLanguageFromCli, false);
+		});
+
+		it("should normalize targetLang2", () => {
+			const config = {
+				home: {
+					deepL: {
+						targetLang2: "en", // Should be normalized to en-US
+					},
+				},
+				local: {},
+			};
+
+			const result = resolveParameters({ first: null, last: null }, config, false);
+
+			assert.strictEqual(result.targetLanguageSecond, "en-US");
+		});
+
+		it("should prioritize local targetLang2 over home", () => {
+			const config = {
+				home: {
+					deepL: {
+						targetLang2: "ja",
+					},
+				},
+				local: {
+					deepL: {
+						targetLang2: "fr",
+					},
+				},
+			};
+
+			const result = resolveParameters({ first: null, last: null }, config, false);
+
+			assert.strictEqual(result.targetLanguageSecond, "fr");
+		});
+
+		it("should detect when target language comes from CLI", () => {
+			const firstLang = { sourceLang: null, targetLang: "de" };
+
+			const result = resolveParameters({ first: firstLang, last: null }, emptyConfig, false);
+
+			assert.strictEqual(result.targetLanguage, "de");
+			assert.strictEqual(result.isTargetLanguageFromCli, true);
+		});
+
+		it("should detect when target language does not come from CLI", () => {
+			const config = {
+				home: {
+					deepL: {
+						targetLang: "de",
+					},
+				},
+				local: {},
+			};
+
+			const result = resolveParameters({ first: null, last: null }, config, false);
+
+			assert.strictEqual(result.targetLanguage, "de");
+			assert.strictEqual(result.isTargetLanguageFromCli, false);
+		});
 	});
 });

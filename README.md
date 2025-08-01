@@ -67,6 +67,8 @@ ja: 私は大丈夫です :vi      # from Japanese to Vietnamese
 
 ## Static Configuration
 
+### Configuration File
+
 You can configure the tool by creating a `.sagmalrc.json` file in either your home directory or the current directory.
 
 The configuration file must be in JSON format and can include:
@@ -74,6 +76,7 @@ The configuration file must be in JSON format and can include:
 - `copyToClipboard`: Automatically copy translated text to clipboard.
 - `deepL.sourceLang`: The default source language code.
 - `deepL.targetLang`: The default target language code.
+- `deepL.targetLang2`: The second-default target language code. See [Second-Default Target Language](#second-default-target-language) for details.
 - `deepL.options`: [Text translation options](https://github.com/deeplcom/deepl-node?tab=readme-ov-file#text-translation-options) that will be passed to the DeepL API.
 
 ```json
@@ -81,7 +84,8 @@ The configuration file must be in JSON format and can include:
   "copyToClipboard": true,
   "deepL": {
     "sourceLang": "ja",
-    "targetLang": "vi",
+    "targetLang": "en-US",
+    "targetLang2": "ja",
     "options": {
       "formality": "less",
       "context": "Always translate technical terms to English",
@@ -91,6 +95,26 @@ The configuration file must be in JSON format and can include:
   }
 }
 ```
+
+### Second-Default Target Language
+
+The `targetLang2` option provides automatic fallback when sagmal assumes
+no meaningful translation occurred due to matching source and target languages.
+This commonly happens when inputting English text with default English target.
+
+**Example:**
+```bash
+# Config: { "deepL": { "targetLang2": "de" } }
+sagmal "Hello world"  # → Detects English → Targets "de" instead of English → "Hallo Welt"
+```
+
+**Conditions:**
+- Target language not explicitly specified via CLI (`:en`, `de:`, etc.)
+- `targetLang2` configured in `.sagmalrc.json`
+- Detected source language matches resolved target language
+- Input/output text unchanged
+
+**Note:** Uses simplified language matching (e.g., `en` matches `en-US`, but `en-US` ≠ `en-GB`) although it is not accurate for all cases.
 
 
 ## References
