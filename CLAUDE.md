@@ -19,3 +19,7 @@ You are working on a small CLI tool that translates any input text by using the 
     - the language options are colon-separated instead of using `--from` and `--to` options.
     - the input text does not need to be quoted, so it can contain spaces.
 - Npm dependencies are `deepl-node` and `dotenv`. Suggest adding more if necessary.
+
+## Security Guidelines
+
+- **Never log or expose API keys**: Avoid any console output, debug statements, or error messages that could expose the DeepL API key or other sensitive information. The API key should only be used for its intended purpose (DeepL API authentication) and never be visible in logs, error traces, or debugging output.
