@@ -2,6 +2,7 @@
 
 Command-line translation tool powered by the DeepL API.
 
+> "sagmal" comes from the German "Sag mal" ("say" or "tell me").
 
 ## Quick Start
 
@@ -27,22 +28,32 @@ sagmal <text-to-translate>
 
 ## Specifying Languages
 
-If the first word of your input contains a colon (`:`), it will be interpreted as a language option.
+You can specify language options at the **first** or **last** position of your input using colon (`:`) syntax.
 
 The format is `[from]:[to]`.
 
-Examples:
+### Language Option Examples
 
 ```text
-:en     # translate to English
-de:     # from German
-ja:vi   # from Japanese to Vietnamese
+# Language option at the first position
+de: Hallo Welt             # from German
+:en Oh mon Dieu            # to English
+ja:vi 私は大丈夫です        # from Japanese to Vietnamese
+
+# Language option at the last position
+Hallo Welt de:             # from German
+Oh mon Dieu :en            # to English
+私は大丈夫です ja:vi        # from Japanese to Vietnamese
+
+# Language options at both positions (confliction should be avoided)
+ja: 私は大丈夫です :vi      # from Japanese to Vietnamese
 ```
 
-**Defaults:**
 
-- If the source language is not specified via the CLI or configuration file, the DeepL API will automatically detect the source language.
-- If the target language is not specified via the CLI or configuration file, it defaults to `en-US` (English, United States).
+### Language Defaults
+
+- If you don't specify a source language in the CLI or config file, the DeepL API will detect it automatically.
+- If you don't specify a target language in either place, it will default to `en-US`.
 
 
 ## Configuration
@@ -78,9 +89,14 @@ If no text is provided, or if the first argument is `--help` or `-h`, the tool w
 ```text
 Usage:
   sagmal [languages] <text>
+  sagmal <text> [languages]
+  sagmal [language] <text> [language]
 Examples:
-  sagmal Hallo, Welt!
-  sagmal ja: 私は大丈夫です
+  sagmal Bonjour tout le monde
+  sagmal de: Hallo Welt!
   sagmal :it It's not a bug, it's a feature
   sagmal fr:ar Je pense, donc je suis
+  sagmal I have made a terrible mistake :ja
+  sagmal 404 Motivation Not Found en:de
+  sagmal ja: 私は大丈夫です :zh-HANT
 ```

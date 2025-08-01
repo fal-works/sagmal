@@ -47,9 +47,15 @@ graph LR
 - **Responsibility**: Loading and parsing config files
 - **Data Source**: Home directory and current directory `.sagmalrc.json` files
 
-#### `src/cli-language-parser.ts` - CLI Language Parsing
-- **Responsibility**: Parse colon-separated language options
-- **Input**: First CLI argument (`:en`, `ja:vi`, `de:`, etc.)
+#### `src/cli-parser.ts` - CLI Argument Parsing
+- **Responsibility**: Parse all CLI arguments and extract options
+- **Input**: All CLI arguments
+- **Output**: Parsed language options and remaining text parts
+
+#### `src/cli-language-parser.ts` - CLI Language Option Parsing
+- **Responsibility**: Parse individual colon-separated language options
+- **Input**: Single CLI argument (`:en`, `ja:vi`, `de:`, etc.)
+- **Output**: Language option data or null
 
 #### `src/parameter-resolver.ts` - Central Parameter Resolution
 - **Responsibility**: Single source of truth for all cascading logic

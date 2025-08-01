@@ -7,10 +7,13 @@ export function showHelp(): void {
 Usage:
   sagmal [languages] <text>
 Examples:
-  sagmal Hallo, Welt!
-  sagmal ja: 私は大丈夫です
+  sagmal Bonjour tout le monde
+  sagmal de: Hallo Welt!
   sagmal :it It's not a bug, it's a feature
-  sagmal fr:la Je pense, donc je suis
+  sagmal I have made a terrible mistake :ja
+  sagmal fr:ar Je pense, donc je suis
+  sagmal ja: 私は大丈夫です :zh-HANT
+  sagmal 404 Motivation Not Found en:de
 `.trim();
 
 	console.log(msg);
