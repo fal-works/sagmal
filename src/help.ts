@@ -5,9 +5,18 @@
 export function showHelp(): void {
 	const msg = `
 Usage:
-  sagmal [languages] <text>
-Examples:
-  sagmal Bonjour tout le monde
+  sagmal [options] [languages] <text>
+  sagmal [options] <text> [languages]
+  sagmal [options] [language] <text> [language]
+
+Options:
+  -c, --copy          Copy translated text to clipboard
+  -h, --help          Show this help message
+
+Example:
+  sagmal おしまいだ
+
+Examples with language options:
   sagmal de: Hallo Welt!
   sagmal :it It's not a bug, it's a feature
   sagmal I have made a terrible mistake :ja

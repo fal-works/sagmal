@@ -1,10 +1,30 @@
 # @fal-works/sagmal
 
-Command-line translation tool powered by the DeepL API.
+CLI translation tool powered by the [DeepL API](https://developers.deepl.com/).
 
-> "sagmal" comes from the German "Sag mal" ("say" or "tell me").
+> “sagmal” comes from the German “Sag mal,” which means “say” or “tell me.”
 
 Note: This is an early-stage project, primarily developed for personal use.
+
+
+## In Short
+
+```text
+C:\> sagmal Oh mein Gott!   # Input any text after the command
+Oh my God!                  # Output (translated)
+```
+
+
+## Key Features
+
+- Simple CLI for instant text translation
+- Language selection via colon syntax (e.g., `de:`, `:en`), similar to [translate-shell](https://github.com/soimort/translate-shell)
+- Usually you don't need to quote the input text (unless it contains special characters or something)
+- Optionally copy results to the clipboard
+- Supports config files for persistent preferences, with JSON schema validation
+- Automatic fallback to a secondary target language
+- Works on Windows (and possibly other platforms, but I haven't tried them)
+
 
 ## Quick Start
 
@@ -27,12 +47,12 @@ Or, if you have installed it globally:
 sagmal <text-to-translate>
 ```
 
-Then you will see the translated text in your terminal.
+The translated text will then appear in your terminal.
 
 
-## Specifying Languages
+## Language Options
 
-You can specify language options at the **first** or **last** position of your input using colon (`:`) syntax.
+You can specify language options at the **first** or **last** position of your input text using colon (`:`) syntax.
 
 The format is `[from]:[to]`.
 
@@ -49,32 +69,52 @@ Hallo Welt de:             # from German
 Oh mon Dieu :en            # to English
 私は大丈夫です ja:vi        # from Japanese to Vietnamese
 
-# Language options at both positions (confliction should be avoided)
+# Language options at both positions (avoid conflicts)
 ja: 私は大丈夫です :vi      # from Japanese to Vietnamese
 ```
 
-
 ### Language Defaults
 
-- If you don't specify a source language in the CLI or config file, the DeepL API will detect it automatically.
-- If you don't specify a target language in either place, it will default to `en-US`.
+- If you do not specify a source language in the CLI or config file, the DeepL API will detect it automatically.
+- If you do not specify a target language in the CLI or config file, it will default to `en-US`.
 
 
-## Configuration
+## Other Options
+
+- `-c`, `--copy` : Copy translated text to clipboard (if available)
+- `-h`, `--help` : Show help message
+
+
+## Static Configuration
+
+### Configuration File
 
 You can configure the tool by creating a `.sagmalrc.json` file in either your home directory or the current directory.
 
+For editor validation and autocompletion, add the JSON schema reference at the top of your config file:
+
+```json
+{
+  "$schema": "https://fal-works.github.io/sagmal/sagmalrc/v0.x.x/schema.json"
+}
+```
+
 The configuration file must be in JSON format and can include:
 
-- `deepL.sourceLang`: The default source language code.
-- `deepL.targetLang`: The default target language code.
+- `copyToClipboard`: Automatically copy translated text to clipboard.
+- `deepL.sourceLang`: The default [source language code](https://developers.deepl.com/docs/getting-started/supported-languages).
+- `deepL.targetLang`: The default [target language code](https://developers.deepl.com/docs/getting-started/supported-languages#translation-source-languages).
+- `deepL.targetLang2`: The secondary default target language code. See [Secondary Default Target Language](#secondary-default-target-language) for details.
 - `deepL.options`: [Text translation options](https://github.com/deeplcom/deepl-node?tab=readme-ov-file#text-translation-options) that will be passed to the DeepL API.
 
 ```json
 {
+  "$schema": "https://fal-works.github.io/sagmal/sagmalrc/v0.x.x/schema.json",
+  "copyToClipboard": true,
   "deepL": {
     "sourceLang": "ja",
-    "targetLang": "vi",
+    "targetLang": "en-US",
+    "targetLang2": "ja",
     "options": {
       "formality": "less",
       "context": "Always translate technical terms to English",
@@ -85,25 +125,26 @@ The configuration file must be in JSON format and can include:
 }
 ```
 
+### Secondary Default Target Language
 
-## Help message
+The `targetLang2` option provides automatic fallback when sagmal assumes
+no meaningful translation occurred due to matching source and target languages.
+This commonly happens when you input English text and the default target language is also English.
 
-If no text is provided, or if the first argument is `--help` or `-h`, the tool will display a help message.
-
-```text
-Usage:
-  sagmal [languages] <text>
-  sagmal <text> [languages]
-  sagmal [language] <text> [language]
-Examples:
-  sagmal Bonjour tout le monde
-  sagmal de: Hallo Welt!
-  sagmal :it It's not a bug, it's a feature
-  sagmal fr:ar Je pense, donc je suis
-  sagmal I have made a terrible mistake :ja
-  sagmal 404 Motivation Not Found en:de
-  sagmal ja: 私は大丈夫です :zh-HANT
+**Example:**
+```bash
+# Config: { "deepL": { "targetLang2": "de" } }
+sagmal Hello world
+# → Detects English → Targets "de" instead of English → "Hallo Welt"
 ```
+
+**Conditions:**
+- Target language not explicitly specified via CLI (`:en`, `de:`, etc.)
+- `targetLang2` configured in `.sagmalrc.json`
+- Detected source language matches resolved target language
+- Input and output text are unchanged
+
+**Note:** Simplified language matching is used (e.g., `en` matches `en-US`, but `en-US` does not match `en-GB`), which may not be accurate in all cases.
 
 
 ## References

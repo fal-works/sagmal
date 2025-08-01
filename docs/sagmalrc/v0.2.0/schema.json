@@ -1,0 +1,42 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://fal-works.github.io/sagmal/sagmalrc/v0.2.0/schema.json",
+	"title": "@fal-works/sagmal JSON Schema for .sagmalrc",
+	"description": "JSON schema for .sagmalrc configuration files used by @fal-works/sagmal, a CLI translation tool.\nhttps://github.com/fal-works/sagmal",
+	"type": "object",
+	"properties": {
+		"$schema": {
+			"type": "string",
+			"description": "JSON Schema reference for validation."
+		},
+		"copyToClipboard": {
+			"type": "boolean",
+			"description": "Whether to automatically copy translated text to the clipboard."
+		},
+		"deepL": {
+			"type": "object",
+			"description": "DeepL API configuration.",
+			"properties": {
+				"sourceLang": {
+					"type": "string",
+					"description": "Default source language code.\nValidated by DeepL API, not by this schema.\nhttps://developers.deepl.com/docs/getting-started/supported-languages"
+				},
+				"targetLang": {
+					"type": "string",
+					"description": "Default target language code.\nValidated by DeepL API, not by this schema.\nhttps://developers.deepl.com/docs/getting-started/supported-languages#translation-source-languages"
+				},
+				"targetLang2": {
+					"type": "string",
+					"description": "Secondary default target language code used as a fallback.\nValidated by DeepL API, not by this schema.\nhttps://developers.deepl.com/docs/getting-started/supported-languages#translation-source-languages"
+				},
+				"options": {
+					"type": "object",
+					"description": "Other DeepL API options (formality, context, modelType, etc.) that are directly passed to the API.\nValidated by DeepL API, not by this schema.\nhttps://github.com/deeplcom/deepl-node?tab=readme-ov-file#text-translation-options",
+					"additionalProperties": true
+				}
+			},
+			"additionalProperties": false
+		}
+	},
+	"additionalProperties": false
+}

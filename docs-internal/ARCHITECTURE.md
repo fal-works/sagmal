@@ -48,9 +48,9 @@ graph LR
 - **Data Source**: Home directory and current directory `.sagmalrc.json` files
 
 #### `src/cli-parser.ts` - CLI Argument Parsing
-- **Responsibility**: Parse all CLI arguments and extract options
-- **Input**: All CLI arguments
-- **Output**: Parsed language options and remaining text parts
+- **Responsibility**: Parse all CLI arguments and return structured data
+- **Output**: Parsed command options, language options, and remaining text parts
+- **Key Pattern**: Uses Node.js built-in `parseArgs` and then also extract options from positionals
 
 #### `src/cli-language-parser.ts` - CLI Language Option Parsing
 - **Responsibility**: Parse individual colon-separated language options
@@ -63,9 +63,18 @@ graph LR
 - **Output**: Fully resolved parameters ready for DeepL API
 
 #### `src/translator.ts` - DeepL API Integration
-- **Responsibility**: Translation function
+- **Responsibility**: Translation function with targetLang2 fallback logic
 - **Input**: API key + text + resolved parameters
 - **Output**: Translated text
+- **Key Behavior**: Automatically switches to targetLang2 under certain conditions
+
+#### `src/clipboard.ts` - Clipboard Integration
+- **Responsibility**: Cross-platform clipboard operations
+- **Key Behavior**: Silently handles clipboard copy failures as non-fatal
+
+#### `src/language-code.ts` - Language Code Utilities
+- **Responsibility**: Language code comparison and matching logic
+- **Usage**: Supports targetLang2 feature by determining if languages can be assumed as equivalent
 
 #### `src/help.ts` - Help Display
 - **Responsibility**: Display usage instructions

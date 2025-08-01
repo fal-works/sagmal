@@ -16,19 +16,17 @@ export interface CliLanguageOptions {
 
 /**
  * Parses colon-separated language options from a command line argument.
- * Returns null if argument doesn't contain colon.
+ * Returns null if argument doesn't contain exactly one colon.
  */
 export function parseCliLanguageOption(arg: string): CliLanguageOptionData | null {
-	if (!arg.includes(":")) {
-		return null;
-	}
+	const parts = arg.split(":");
 
-	const colonIndex = arg.indexOf(":");
-	const beforeColon = arg.substring(0, colonIndex);
-	const afterColon = arg.substring(colonIndex + 1);
+	// Must have exactly 2 parts (one colon)
+	if (parts.length !== 2) return null;
 
+	// Normalize empty parts to null
 	return {
-		sourceLang: beforeColon || null,
-		targetLang: afterColon || null,
+		sourceLang: parts[0] || null,
+		targetLang: parts[1] || null,
 	};
 }

@@ -1,5 +1,14 @@
+import { parseArgs } from "node:util";
 import { type CliLanguageOptions, parseCliLanguageOption } from "./cli-language-parser.ts";
 import { SagmalError } from "./errors.ts";
+
+/**
+ * Result of parsing CLI positional arguments.
+ */
+interface CliPositionalParseResult {
+	languageOptions: CliLanguageOptions;
+	text: string;
+}
 
 /**
  * Result of parsing CLI arguments for all options and text.
@@ -7,20 +16,44 @@ import { SagmalError } from "./errors.ts";
 export interface CliParseResult {
 	languageOptions: CliLanguageOptions;
 	text: string;
+	shouldShowHelp: boolean;
+	shouldCopyToClipboard: boolean;
 }
 
 /**
- * Checks if CLI arguments contain help option.
+ * Parses all CLI arguments including options and positionals.
  */
-export function hasHelpOption(args: string[]): boolean {
-	return args.length === 0 || args[0] === "--help" || args[0] === "-h";
+export function parseCliArguments(): CliParseResult {
+	const { values, positionals } = parseArgs({
+		options: {
+			help: {
+				type: "boolean",
+				short: "h",
+			},
+			copy: {
+				type: "boolean",
+				short: "c",
+			},
+		},
+		allowPositionals: true,
+	});
+
+	const shouldShowHelp = values.help || positionals.length === 0;
+	const shouldCopyToClipboard = values.copy ?? false;
+	const positionalResult = parseCliPositionals(positionals);
+
+	return {
+		...positionalResult,
+		shouldShowHelp,
+		shouldCopyToClipboard,
+	};
 }
 
 /**
- * Parses CLI arguments to extract language options and text parts.
+ * Parses CLI positional arguments to extract language options and text parts.
  * Handles language options at both first and last positions.
  */
-export function parseCliArguments(args: string[]): CliParseResult {
+function parseCliPositionals(args: string[]): CliPositionalParseResult {
 	if (args.length === 0) {
 		return {
 			languageOptions: {

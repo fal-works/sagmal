@@ -6,12 +6,14 @@ Use `npm run`, not `pnpm run`.
 
 - `npm run check` - Check code quality (types, linting, and format)
 - `npm run fix` - Check code quality and fix if possible
+- `npm run test:unit` - Run unit tests
 - `npm run build` - Build
 
 ## Development Workflow
 
 - After any changes, run the below
 	- `npm run fix`
+	- `npm run test:unit`
 
 ## Code Requirements
 
